@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Accelerometer Sensor Data</title>
+</head>
+
+<body>
+  <p>Acceleration: <span id="acceleration"></span></p>
+  <p>Acceleration including gravity: <span id="acceleration-including-gravity"></span></p>
+  <p>Rotation rate: <span id="rotation-rate"></span></p>
+  <p>Interval: <span id="interval"></span></p>
+
+  <script>
+    // Check if the DeviceMotionEvent is supported
+    if (window.DeviceMotionEvent) {
+      // Add an event listener to the window object
+      window.addEventListener('devicemotion', function (event) {
+        // Get the accelerometer data from the event object
+        var acceleration = event.acceleration;
+        var accelerationIncludingGravity = event.accelerationIncludingGravity;
+        var rotationRate = event.rotationRate;
+        var interval = event.interval;
+
+        // Check if the acceleration is above 10
+        var accelerationMagnitude = Math.sqrt(acceleration.x * acceleration.x + acceleration.y * acceleration.y + acceleration.z * acceleration.z);
+        if (accelerationMagnitude > 10) {
+          // Send the acceleration data to the server using Ajax
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/acceleration-data', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify({
+            acceleration: acceleration,
+            accelerationIncludingGravity: accelerationIncludingGravity,
+            rotationRate: rotationRate,
+            interval: interval
+          }));
+
+          // Display the acceleration data on the webpage
+          document.getElementById('acceleration').innerHTML = acceleration.x + ', ' + acceleration.y + ', ' + acceleration.z;
+          document.getElementById('acceleration-including-gravity').innerHTML = accelerationIncludingGravity.x + ', ' + accelerationIncludingGravity.y + ', ' + accelerationIncludingGravity.z;
+          document.getElementById('rotation-rate').innerHTML = rotationRate.alpha + ', ' + rotationRate.beta + ', ' + rotationRate.gamma;
+          document.getElementById('interval').innerHTML = interval;
+        }
+      });
+    } else {
+      // The DeviceMotionEvent is not supported
+      alert('DeviceMotionEvent is not supported.');
+    }
+  </script>
+</body>
+
+</html>
